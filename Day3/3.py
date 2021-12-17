@@ -1,12 +1,10 @@
 from functools import reduce
 
-data = []
-
 with open('input.txt', 'r+') as f:
     data = [line.strip('\n') for line in f.readlines()]
     f.close
 
-#data = ['00100', '11110', '10110', '10111', '10101', '01111', '00111', '11100', '10000', '11001', '00010', '01010']
+#testdata = ['00100', '11110', '10110', '10111', '10101', '01111', '00111', '11100', '10000', '11001', '00010', '01010']
 
 gamma = [sum([int(d[i]) for d in data])*2//len(data) for i in range(len(data[0]))]
 epsilon = [int(not d) for d in gamma]
