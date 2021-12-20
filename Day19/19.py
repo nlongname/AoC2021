@@ -16,7 +16,7 @@ def generalized_distance(a:tuple,b:tuple) -> tuple:
     pseudovector = set([abs(c) for c in vector])
     return vector, pseudovector #vector for transformations, pseudovector for matching
 
-
+scanners = {}
 
 crossover = [None,None]
 while crossover.count([]) < len(crossover)-1:
@@ -80,7 +80,8 @@ while crossover.count([]) < len(crossover)-1:
             else:
                 minus = False
                 scanner_location = best_plus
-            print(i, scanner_location)
+            scanners[i] = scanner_location
+            print(i,scanner_location)
             if minus: #this is what we expect, our map is correct
                 mapped_points = [tuple(p[axis_map[i]]*signs[i] + scanner_location[i] for i in range(3)) for p in data[i]]
             else:
@@ -90,3 +91,5 @@ while crossover.count([]) < len(crossover)-1:
     data[0] = list(set(data[0]+to_add))
     #print([len(d) for d in data])
 print(len(data[0]))
+
+print(max(sum(abs(scanners[a][i]-scanners[b][i]) for i in range(3)) for a in scanners for b in scanners))
