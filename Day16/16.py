@@ -8,7 +8,7 @@ packets = {}
 #(in which case endBit starts as None, but will update later) 
 #if it's a literal, value is the value
 
-#data =['C0015000016115A2E0802F182340']
+#data =['C200B40A82']
 data = bin(int(data[0],16))[2:]
 front_pad = 0
 if len(data)%4 != 0:
@@ -53,3 +53,92 @@ def analyze_packet(bitstream:str,startBit:int = 0) -> None:
 analyze_packet(data)
 
 print(sum([packets[x][0] for x in packets]))
+
+#packets format is startBit:[version, type, endBit(or None),value(or None)]
+
+packet_list = sorted(packets.keys()) + [None]
+
+def value(pointer:int = 0) -> tuple: #returns (value, next packet index(or None))
+    packet = packets[pointer]
+    packetVersion, packetType, endBit, val = packet
+    pointer = packet_list[packet_list.index(pointer)+1]
+    if packetType == 4:
+        return (val, pointer)
+    elif packetType == 0:
+        answer = 0
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                answer += temp
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                answer += temp
+    elif packetType == 1:
+        answer = 1
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                answer *= temp
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                answer *= temp
+    elif packetType == 2:
+        options = []
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                options.append(temp)
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                options.append(temp)
+        answer = min(options)
+    elif packetType == 3:
+        options = []
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                options.append(temp)
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                options.append(temp)
+        answer = max(options)
+    elif packetType == 5:
+        options = []
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                options.append(temp)
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                options.append(temp)
+        answer = int(options[0] > options[1])
+    elif packetType == 6:
+        options = []
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                options.append(temp)
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                options.append(temp)
+        answer = int(options[0] < options[1])
+    elif packetType == 7:
+        options = []
+        if endBit != None:
+            while pointer != None and pointer < endBit:
+                temp, pointer = value(pointer)
+                options.append(temp)
+        else:
+            for i in range(val):
+                temp, pointer = value(pointer)
+                options.append(temp)
+        answer = int(options[0] == options[1])
+    return (answer, pointer)
+
+print(value()[0])
